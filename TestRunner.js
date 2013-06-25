@@ -2,39 +2,42 @@ import System.IO;
 import System.Text.RegularExpressions;
 
 class TestRunner extends MonoBehaviour {
+  static var total;
+  static var failures;
 
   function Start() {
-    Debug.Log('* Running Tests...');
+    if (!Application.isEditor) return;
 
-    // These lines should be altered to point to your test directory
-    // and follow your naming conventions for test files.
-    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*_test.js");
-    regex = new Regex("([a-zA-Z_]+_test)");
-    for (file in test_files) {
-      behaviour = test_regex.Match(file.ToString()).Groups[1].Value;
+    Debug.Log('** Running tests...');
+    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*_test.js"); // Edit these lines if your tests
+    regex = new Regex("([a-zA-Z_]+_test)");                                 // live elsewhere or are named elsewise
+    total = failures = 0;
+    for (file in files) {
+      behaviour = regex.Match(file.ToString()).Groups[1].Value;
       if (behaviour) {
         test_object = new GameObject();
         test_object.AddComponent(behaviour);
-        test_object.SendMessage('RunTests'); // Assume all test files respond to 'RunTests'
+        test_object.SendMessage('RunTests');
         Destroy(test_object);
       }
     }
 
-    Debug.Log('* ...Done!');
+    Debug.Log('** ' + total + ' assertions, ' + failures + ' failures.');
   }
 
   static function Assert(expression, message) {
+    total += 1;
     if (!expression) {
-      Debug.Log("TEST FAILURE: " + message); // Consider also using throw or Debug.Break()
+      failures += 1;
+      Debug.Log('  * Assertion Error' + (message ? ': ' + message : ''));
+      //Debug.Break(); // To pause the editor
     }
-    return expression;
   }
 
-  static function AssertEqual(a, b, message) {
-    return Assert((a == b), message);
-  }
-
-  static function AssertUnequal(a, b, message) {
-    return Assert((a != b), message);
-  }
+  /* Helpers */
+  static function AssertEqual(a, b, message)   { Assert((a == b), message); }
+  static function AssertUnequal(a, b, message) { Assert((a != b), message); }
+  static function Assert(expression)           { Assert(expression, null);  }
+  static function AssertEqual(a, b)            { Assert((a == b)); }
+  static function AssertUnequal(a, b)          { Assert((a != b)); }
 }
