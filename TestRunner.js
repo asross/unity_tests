@@ -26,7 +26,7 @@ class TestRunner extends MonoBehaviour {
       }
     }
 
-    Debug.Log('** ' + total + ' examples, ' + failures + ' failures, ' + errors + ' errors. ' + assertions + ' assertions.' );
+    Debug.Log(String.Format('** {0} examples, {1} failures, {2} errors. {3} assertions.', total, failures, errors, assertions));
   }
 
   function Run(test, method) {
