@@ -2,21 +2,30 @@
 
 ### Basic Usage
 
-1. Create a `_test.js` file in `Assets/Scripts/Test` that defines a function `RunTests`.
-2. Make that `RunTests` function call `UnitTest.Assert` or one its helper methods.
-3. Attach the `UnitTest` script to one (and only one) game object somewhere in your scene.
+1. Create a `_test.js` file in `Assets/Scripts/Test`
+2. Define functions with `Test` in their names
+3. Make those functions call `UnitTest.Assert`
+4. Attach the `UnitTest` script to an object in your scene
 
-When the object with the `UnitTest` behavior initializes, it will look for all scripts matching the `_test.js` naming convention in the `Scripts/Tests` directory, create an object with the test script attached, and send the `RunTests` method to it. It will count the assertions you make and print out Debug.Log with a stack trace if there's a failure.
+When the object with the `UnitTest` behavior initializes, it will look for all scripts matching the `_test.js` naming convention in the `Scripts/Tests` directory, create an object with the test script attached, and call all methods matching `Test`. It will count the assertions you make and print out stack traces if there are failures or errors.
 
 ### E.G.
 ```javascript
 // Assets/Scripts/Test/foo_test.js
 
-function RunTests() {
+function PassingTest() {
   UnitTest.Assert(true);
-  UnitTest.AssertEqual(5, 5, "Five should equal five");
-  UnitTest.AssertUnequal(5, "Pasta sauce", "Pasta sauce isn't a quantity!");
+}
 
+function AnotherPassingTest() {
+  UnitTest.AssertEqual(5, 5, "Five should equal five");
+}
+
+function FailingTest() {
+  UnitTest.AssertUnequal(5, "Pasta sauce", "Pasta sauce isn't a quantity!");
+}
+
+function TestThatCreatesObjects() {
   testObject = new GameObject();
   testObject.transform.position = Vector3(5, 5, 5);
   UnitTest.That(testObject.transform.position.z == 5);
