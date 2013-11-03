@@ -1,27 +1,27 @@
 import System.IO;
 import System.Text.RegularExpressions;
 
-class UnitTest extends MonoBehaviour {
-  static var total;
-  static var failures;
-  static var errors;
+class TestRunner extends MonoBehaviour {
+  var total;
+  var errors;
+  var failures;
   static var assertions;
 
   function Start() {
     if (!Application.isEditor) return;
 
     Debug.Log('** Running tests...');
+    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*_test.js");
+    regex = new Regex("([a-zA-Z_]+_test)");
+    total = assertions = failures = errors = 0;
 
-    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*_test.js"); // Edit these lines if your tests
-    regex = new Regex("([a-zA-Z_]+_test)");                                 // live elsewhere or are named elsewise
-    total = failures = errors = assertions = 0;
     for (file in files) {
       behaviour = regex.Match(file.ToString()).Groups[1].Value;
       if (behaviour) {
         test = gameObject.AddComponent(behaviour);
-        for (m in test.GetType().GetMethods())
-          if (m.Name.Contains('Test'))
-            Run(m, test);
+        for (method in test.GetType().GetMethods())
+          if (method.Name.Contains('Test'))
+            Run(test, method);
         Destroy(test);
       }
     }
@@ -29,7 +29,7 @@ class UnitTest extends MonoBehaviour {
     Debug.Log('** ' + total + ' examples, ' + failures + ' failures, ' + errors + ' errors. ' + assertions + ' assertions.' );
   }
 
-  function Run(method, test) {
+  function Run(test, method) {
     total += 1;
     try {
       method.Invoke(test, null);
@@ -53,12 +53,10 @@ class UnitTest extends MonoBehaviour {
 
   /* Helpers */
   static function Assert(expression)           { Assert(expression, null);  }
+  static function AssertNot(expression)        { Assert(!expression);       }
+  static function AssertNot(expression, msg)   { Assert(!expression, msg);  }
   static function AssertEqual(a, b)            { Assert((a == b));          }
   static function AssertEqual(a, b, message)   { Assert((a == b), message); }
   static function AssertUnequal(a, b)          { Assert((a != b));          }
   static function AssertUnequal(a, b, message) { Assert((a != b), message); }
-  static function AssertNot(expression)        { Assert(!expression);       }
-  static function AssertNot(expression, msg)   { Assert(!expression, msg);  }
-  static function That(expression)             { Assert(expression);        }
-  static function That(expression, msg)        { Assert(expression, msg);   }
 }
