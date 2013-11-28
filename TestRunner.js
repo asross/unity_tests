@@ -11,8 +11,8 @@ class TestRunner extends MonoBehaviour {
     if (!Application.isEditor) return;
 
     Debug.Log('** Running tests...');
-    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*_test.js");
-    regex = new Regex("([a-zA-Z_]+_test)");
+    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*Test.?s");
+    regex = new Regex("([a-zA-Z_]+Test)");
     total = assertions = failures = errors = 0;
 
     for (file in files) {
