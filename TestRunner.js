@@ -1,28 +1,34 @@
-import System.IO;
 import System.Text.RegularExpressions;
 
 class TestRunner extends MonoBehaviour {
   var total;
   var errors;
   var failures;
-  static var assertions;
+  var assertions;
 
   function Start() {
-    if (!Application.isEditor) return;
+    if (Application.isEditor) {
+      yield RunTests();
+    }
+  }
 
+  function RunTests() : IEnumerator {
     Debug.Log('** Running tests...');
-    files = new DirectoryInfo("Assets/Scripts/Test").GetFiles("*Test.?s");
-    regex = new Regex("([a-zA-Z_]+Test)");
+
     total = assertions = failures = errors = 0;
 
-    for (file in files) {
-      behaviour = regex.Match(file.ToString()).Groups[1].Value;
-      if (behaviour) {
-        test = gameObject.AddComponent(behaviour);
-        for (method in test.GetType().GetMethods())
-          if (method.Name.Contains('Test'))
-            Run(test, method);
-        Destroy(test);
+    for (assembly in System.AppDomain.CurrentDomain.GetAssemblies()) {
+      for (type in assembly.GetTypes()) {
+        if (type.IsSubclassOf(typeof(UnitTest))) {
+          test = gameObject.AddComponent(type);
+          for (method in type.GetMethods()) {
+            if (method.Name.Contains('Test')) {
+              Run(test, method);
+              yield;
+            }
+          }
+          Destroy(test);
+        }
       }
     }
 
@@ -40,23 +46,23 @@ class TestRunner extends MonoBehaviour {
       } else {
         errors += 1;
       }
-      Debug.LogException(ee);
+      LogFailure(ee, test, method);
     }
+    assertions += test.assertions;
   }
 
-  static function Assert(expression, message) {
-    assertions += 1;
-    if (!expression) {
-      throw new Boo.Lang.Runtime.AssertionFailedException(message);
-    }
-  }
+  function LogFailure(error, test, method) {
+    lineNumber = null;
+    failurePrefix = test.GetType() + "." + method.Name;
 
-  /* Helpers */
-  static function Assert(expression)           { Assert(expression, null);  }
-  static function AssertNot(expression)        { Assert(!expression);       }
-  static function AssertNot(expression, msg)   { Assert(!expression, msg);  }
-  static function AssertEqual(a, b)            { Assert((a == b));          }
-  static function AssertEqual(a, b, message)   { Assert((a == b), message); }
-  static function AssertUnequal(a, b)          { Assert((a != b));          }
-  static function AssertUnequal(a, b, message) { Assert((a != b), message); }
+    //Class.Method ... (at Assets/Scripts/Test/Class.js:555)
+    for (line in error.StackTrace.Split("\n"[0])) {
+      if (line.Contains(failurePrefix)) {
+        lineNumber = Regex(":([0-9]+)").Match(line).Groups[1].Value;
+      }
+    }
+
+    Debug.LogError(String.Format("** Failed at {0}, line {1}", failurePrefix, lineNumber));
+    Debug.LogException(error);
+  }
 }
