@@ -27,8 +27,10 @@ class UnitTest extends MonoBehaviour {
 
   function AssertApproximately(a, b) { AssertApproximately(a, b, ''); }
   function AssertApproximately(a, b, m) {
-    Assert((a != b), m+String.Format("expected {0} to approximately equal {1}", a, b));
+    Assert(Mathf.Approximately(a, b), m+String.Format("expected {0} to approximately equal {1}", a, b));
   }
+  function AssertApprox(a, b) { AssertApproximately(a, b, ''); }
+  function AssertApprox(a, b, m) { AssertApproximately(a, b, m); }
 
   function AssertContains(item, list) { AssertContains(item, list, ''); }
   function AssertContains(item, list, m) {
