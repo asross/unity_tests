@@ -62,7 +62,8 @@ class TestRunner extends MonoBehaviour {
       }
     }
 
-    Debug.LogError(String.Format("** Failed at {0}, line {1}", failurePrefix, lineNumber));
-    Debug.LogException(error);
+    errorMessage = String.Format("at {0}, line {1}", failurePrefix, lineNumber);
+    newError = System.Activator.CreateInstance(error.GetType(), [errorMessage, error]);
+    Debug.LogError(newError);
   }
 }
