@@ -13,20 +13,24 @@ When the object with the `TestRunner` behavior initializes, it will look for all
 ```javascript
 class FooTest extends UnitTest {
 
-  function PassingTest() {
+  function TestThatWillPass() {
     Assert(true);
   }
 
-  function AnotherPassingTest() {
-    AssertEqual(5, 5, "Five should equal five");
+  function TestThatWillFail() {
+    Assert(false);
+  }
+  
+  function TestThatWillError() {
+    throw 'a chicken';
+  }
+  
+  function TestWithACustomFailureMessage() {
+    AssertUnequal(4, 5, "There are four lights!");
   }
 
-  function FailingTest() {
-    AssertUnequal(5, "Pasta sauce", "Pasta sauce isn't a quantity!");
-  }
-
-  function YetAnotherPassingTest() {
-    AssertContains(5, [1,2,3,4,5], "5 should be contained in the list");
+  function TestArrayContentsButFail() {
+    AssertContains(0, [1,2,3,4,5]);
   }
 
   function TestThatCreatesObjects() {
@@ -58,6 +62,9 @@ public class FooTest : UnitTest {
   }
 }
 ```
+
+And it should produce the following output in your Unity console:
+![image](https://cloud.githubusercontent.com/assets/1022564/5221337/bae570c6-7644-11e4-9d6d-4855cbdbc38d.png)
 
 Note that you'll need to place `UnitTest.js` and `TestRunner.js` in your `Plugins` folder or some other folder that gets compiled first, if you want to use this library with C# tests.
 
