@@ -4,7 +4,7 @@ class UnitTest extends MonoBehaviour {
   function Assert(expression, message) {
     assertions += 1;
     if (!expression) {
-      throw new Boo.Lang.Runtime.AssertionFailedException(message);
+      throw new TestFailure(message);
     }
   }
 

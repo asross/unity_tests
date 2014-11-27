@@ -41,7 +41,7 @@ class TestRunner extends MonoBehaviour {
       method.Invoke(test, null);
     } catch(e : System.Reflection.TargetInvocationException) {
       ee = e.InnerException;
-      if (ee.GetType() == Boo.Lang.Runtime.AssertionFailedException) {
+      if (ee.GetType() == TestFailure) {
         failures += 1;
       } else {
         errors += 1;
