@@ -27,6 +27,7 @@ class TestRunner extends MonoBehaviour {
               yield;
             }
           }
+          assertions += test.assertions;
           Destroy(test);
         }
       }
@@ -48,7 +49,6 @@ class TestRunner extends MonoBehaviour {
       }
       LogFailure(ee, test, method);
     }
-    assertions += test.assertions;
   }
 
   function LogFailure(error, test, method) {
